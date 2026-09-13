@@ -41,8 +41,6 @@ dependencies:
 
   # ── Networking ────────────────────────────────────────────────────────────
   http: ^1.2.1
-  # Certificate pinning ke liye
-  http_certificate_pinning: ^3.0.1
 
   # ── Utilities ─────────────────────────────────────────────────────────────
   image_picker: ^1.0.7

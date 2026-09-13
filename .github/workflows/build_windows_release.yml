@@ -1,0 +1,101 @@
+name: Build & Package Windows Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: "Version string for installer (e.g. 1.0.0)"
+        required: false
+        default: "1.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows x64 Installer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Inno Setup Compiler
+        run: |
+          choco install innosetup --no-progress
+          echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Enable Windows Desktop Support
+        run: flutter config --enable-windows-desktop
+
+      - name: Determine Application Version
+        id: version_step
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            APP_VER="${{ github.event.inputs.version_override }}"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            APP_VER="${GITHUB_REF_NAME#v}"
+          else
+            APP_VER="1.0.0"
+          fi
+          echo "APP_VERSION=$APP_VER" >> $GITHUB_ENV
+          echo "Building Version: $APP_VER"
+
+      - name: Install Flutter Dependencies
+        run: flutter pub get
+
+      - name: Verify Code Quality & Tests
+        run: |
+          flutter analyze --no-fatal-warnings --no-fatal-infos
+          flutter test
+
+      - name: Build Flutter Windows Native Release
+        run: flutter build windows --release
+
+      - name: Compile Standalone Inno Setup Installer (.exe)
+        run: |
+          iscc /DMyAppVersion="${{ env.APP_VERSION }}" AIVistaStudio_Setup.iss
+
+      - name: Package Portable Windows ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath "AIVistaStudio_Windows_x64_v${{ env.APP_VERSION }}_Portable.zip" -Force
+
+      - name: Upload Windows Setup Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIVistaStudio_Setup_x64
+          path: AIVistaStudio_Setup_x64.exe
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload Portable Zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIVistaStudio_Windows_Portable
+          path: AIVistaStudio_Windows_x64_v${{ env.APP_VERSION }}_Portable.zip
+          retention-days: 90
+
+      - name: Publish to GitHub Releases (Tags Only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            AIVistaStudio_Setup_x64.exe
+            AIVistaStudio_Windows_x64_v${{ env.APP_VERSION }}_Portable.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true

@@ -1,0 +1,109 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ── Network ──────────────────────────────────────────────────────── -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+    <!-- ── Storage — Android 13+ (API 33+) granular media permissions ───── -->
+    <!-- READ_MEDIA_IMAGES: view/pick images (JPEG, PNG, HEIC, RAW etc.) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- READ_MEDIA_VIDEO: view/pick videos (MP4, MKV, MPEG4 etc.) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- READ_MEDIA_AUDIO: for video files with audio tracks -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!-- READ_MEDIA_VISUAL_USER_SELECTED: Android 14+ partial access -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+    <!-- ── Storage — Android 12 and below (API 32-) ─────────────────────── -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+
+    <!-- ── Camera ────────────────────────────────────────────────────────── -->
+    <!-- Required for image_picker camera capture -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- ── Notifications ─────────────────────────────────────────────────── -->
+    <!-- Android 13+ requires explicit notification permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- ── Vibration (haptic feedback) ──────────────────────────────────── -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- ── Billing (In-App Purchases) ───────────────────────────────────── -->
+    <uses-permission android:name="com.android.vending.BILLING" />
+
+    <!-- ── Biometric (for secure storage / fingerprint auth) ────────────── -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
+    <!-- ── Foreground service (for background video processing) ─────────── -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <application
+        android:label="VisionAI"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:requestLegacyExternalStorage="true"
+        android:hardwareAccelerated="true"
+        android:usesCleartextTraffic="false">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <!-- FileProvider for sharing files (share_plus) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
+        <!-- ── Google AdMob App ID (required for ads to work) ────────── -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8917206938698127~6142739695" />
+    </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+</manifest>

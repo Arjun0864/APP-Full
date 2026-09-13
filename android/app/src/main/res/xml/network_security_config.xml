@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Config
+  - Cleartext (HTTP) traffic band karo — sirf HTTPS allow hai
+  - Certificate pinning add karo (Railway deploy ke baad)
+  - Debug builds mein user certificates allow karo (testing ke liye)
+-->
+<network-security-config>
+
+    <!-- Production: sirf HTTPS, no cleartext -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Debug builds mein user-installed certificates allow karo -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- Backend domain ke liye certificate pinning -->
+    <!-- Railway deploy ke baad real fingerprint daalna -->
+    <!--
+    <domain-config>
+        <domain includeSubdomains="true">your-app.railway.app</domain>
+        <pin-set expiration="2026-01-01">
+            <pin digest="SHA-256">REPLACE_WITH_REAL_FINGERPRINT=</pin>
+            <pin digest="SHA-256">BACKUP_FINGERPRINT=</pin>
+        </pin-set>
+    </domain-config>
+    -->
+
+</network-security-config>

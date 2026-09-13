@@ -70,6 +70,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.
 echo [4/6] Building Windows Release Native Executable (Release Mode)...
+set "CMAKE_POLICY_VERSION_MINIMUM=3.5"
 call flutter build windows --release
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] flutter build windows failed! Check build logs above.

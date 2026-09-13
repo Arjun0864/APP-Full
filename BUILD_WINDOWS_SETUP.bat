@@ -71,6 +71,8 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo [4/6] Building Windows Release Native Executable (Release Mode)...
 set "CMAKE_POLICY_VERSION_MINIMUM=3.5"
+set "CL=/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS /D_SILENCE_ALL_MSVC_DEPRECATION_WARNINGS"
+set "_CL_=/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS /D_SILENCE_ALL_MSVC_DEPRECATION_WARNINGS"
 call flutter build windows --release
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] flutter build windows failed! Check build logs above.

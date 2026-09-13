@@ -65,6 +65,8 @@ jobs:
       - name: Build Flutter Windows Native Release
         env:
           CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+          CL: "/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS /D_SILENCE_ALL_MSVC_DEPRECATION_WARNINGS"
+          _CL_: "/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS /D_SILENCE_ALL_MSVC_DEPRECATION_WARNINGS"
         run: flutter build windows --release
 
       - name: Compile Standalone Inno Setup Installer (.exe)

@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -112,12 +114,18 @@ class ImageHubScreen extends StatelessWidget {
                   },
                 ),
               ),
-              const BottomNavBar(currentIndex: 2),
+              if (!_isDesktop(context)) const BottomNavBar(currentIndex: 2),
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool _isDesktop(BuildContext context) {
+    if (kIsWeb) return false;
+    return Platform.isWindows || Platform.isMacOS || Platform.isLinux ||
+        MediaQuery.of(context).size.width >= 800;
   }
 }
 

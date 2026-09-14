@@ -406,11 +406,40 @@ class ColorGradeEngine {
 
             final hsl = rgbToHsl(rVal, gVal, bVal);
             final band = getHslBand(hsl[0]);
+            final pixelSat = hsl[1];
 
-            double hNew = hsl[0] + hslHueShifts[band] * 0.4;
-            double sNew = (hsl[1] * hslSatRatios[band]).clamp(0.0, 1.0);
-            double lNew = (hsl[2] * hslLumRatios[band]);
+            // ── SATURATION GUARD ─────────────────────────────────────────
+            // Desaturated / near-grey / neutral pixels (sand, white, black,
+            // concrete) must NEVER receive a hue rotation. These pixels have
+            // hue values that are mathematically unstable and map into random
+            // hue bands even though they look neutral. Applying a band hue
+            // shift to them introduces magenta / pink dots on sand, sky haze,
+            // white clothing, etc.
+            // Guard threshold: saturation < 0.12 → identity transform only
+            final bool isNeutral = pixelSat < 0.12;
 
+            // Band-specific hue shift weight:
+            //   • Orange / Skin (band 1): 0.15 — very conservative to avoid
+            //     magenta bleed onto skin-adjacent neutrals like sand
+            //   • All other bands: 0.35
+            final double bandHueWeight = (band == 1) ? 0.15 : 0.35;
+
+            double hNew = hsl[0];
+            double sNew = hsl[1];
+            double lNew = hsl[2];
+
+            if (!isNeutral) {
+              // Hue — gentle shift weighted by per-band amount
+              hNew = hsl[0] + hslHueShifts[band] * bandHueWeight;
+
+              // Saturation — interpolate ratio, not full application;
+              // clamp ratio closer to 1.0 for near-neutral to avoid blowout
+              final satBlend = (pixelSat / 0.12).clamp(0.0, 1.0); // 0 at neutral, 1 at saturated
+              final effectiveSatRatio = 1.0 + (hslSatRatios[band] - 1.0) * satBlend;
+              sNew = (hsl[1] * effectiveSatRatio).clamp(0.0, 1.0);
+            }
+
+            // Luminance — apply to all pixels (tonal curve is lum-only, no hue risk)
             if (lNew < 0.25) {
               lNew += shadowShift * (1.0 - lNew / 0.25);
             } else if (lNew <= 0.75) {
@@ -419,6 +448,14 @@ class ColorGradeEngine {
               lNew = 0.75 + (lNew - 0.75) * highlightRolloff;
             }
             lNew = lNew.clamp(0.0, 1.0);
+
+            // Luminance ratio — apply with saturation blend to avoid dark
+            // neutral pixels getting weird lum shifts from chromatic bands
+            if (!isNeutral) {
+              final lumBlend = (pixelSat / 0.20).clamp(0.0, 1.0);
+              final lumRatio = 1.0 + (hslLumRatios[band] - 1.0) * lumBlend;
+              lNew = (lNew * lumRatio).clamp(0.0, 1.0);
+            }
 
             final rgbNew = hslToRgb(hNew, sNew, lNew);
 
@@ -566,7 +603,13 @@ class ColorGradeEngine {
           final bVal = 200 * (fy - fz);
 
           final lNew = (lVal - profile.srcLMean) * lRatio + profile.dstLMean;
-          final aNew = (aVal - profile.srcAMean) * aRatio + profile.dstAMean;
+
+          // ── LAB a-channel clamp ──────────────────────────────────────────
+          // Unclamped aRatio on desaturated pixels pushes them into magenta.
+          // Clamp the destination a-value within ±2σ of the source to prevent
+          // large colour swings on neutral / low-saturation pixels.
+          final aNew = ((aVal - profile.srcAMean) * aRatio + profile.dstAMean)
+              .clamp(profile.srcAMean - 2 * profile.srcAStd, profile.srcAMean + 2 * profile.srcAStd);
           final bNew = (bVal - profile.srcBMean) * bRatio + profile.dstBMean;
 
           final fyOut = (lNew + 16.0) / 116.0;
@@ -599,6 +642,9 @@ class ColorGradeEngine {
         double s = hsl[1];
         double l = hsl[2];
 
+        // Input saturation — used to scale protection effects
+        final inSat = rgbToHsl(r, g, b)[1];
+
         // 1. SKY PROTECTION (Cyan & Blue Hues: 170° .. 250°)
         if (h >= 170 && h <= 250) {
           final skyWeight = (1.0 - ((h - 210).abs() / 40.0)).clamp(0.0, 1.0);
@@ -616,7 +662,8 @@ class ColorGradeEngine {
         }
 
         // 3. NATURAL SKIN TONE PRESERVATION (Hue: 15° .. 45°, Sat: 0.15 .. 0.65)
-        if (h >= 15 && h <= 45 && s >= 0.15 && s <= 0.65) {
+        //    Only apply to genuinely chromatic pixels (inSat > 0.15)
+        if (inSat > 0.15 && h >= 15 && h <= 45 && s >= 0.15 && s <= 0.65) {
           final skinWeight = (1.0 - ((h - 30).abs() / 15.0)) * (1.0 - ((s - 0.4).abs() / 0.25).clamp(0.0, 1.0));
           h += profile.skinHueShift * skinWeight * 0.3;
           s *= (1.0 + (profile.skinSatRatio - 1.0) * skinWeight * 0.2);

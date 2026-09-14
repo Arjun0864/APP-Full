@@ -23,6 +23,7 @@ import '../../features/media_player/presentation/universal_image_viewer.dart';
 import '../../features/color_grade/presentation/color_grade_reference_screen.dart';
 import '../../features/color_grade/presentation/color_grade_batch_screen.dart';
 import '../../features/color_grade/presentation/color_grade_result_screen.dart';
+import '../../features/desktop/presentation/desktop_shell.dart';
 import '../../models/app_models.dart';
 import '../../core/ads/ad_manager.dart';
 
@@ -58,22 +59,58 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) => GoRouter(
         transitionType: _TransitionType.fadeSlide,
       ),
     ),
-    GoRoute(
-      path: '/dashboard',
-      pageBuilder: (context, state) => _buildPage(
-        state,
-        const DashboardScreen(),
-        transitionType: _TransitionType.fadeSlide,
-      ),
+
+    // ── Shell-wrapped main navigation routes ──────────────────────────────
+    // On desktop: AppShell renders DesktopShell (persistent top TabBar,
+    //   no bottom nav). Each child screen returns its body content only.
+    // On mobile: AppShell passes through child unchanged (each screen has
+    //   its own Scaffold + BottomNavBar).
+    ShellRoute(
+      builder: (context, state, child) => AppShell(child: child),
+      routes: [
+        GoRoute(
+          path: '/dashboard',
+          pageBuilder: (context, state) => _buildPage(
+            state,
+            const DashboardScreen(),
+            transitionType: _TransitionType.fadeSlide,
+          ),
+        ),
+        GoRoute(
+          path: '/video-generator',
+          pageBuilder: (context, state) => _buildPage(
+            state,
+            const VideoGeneratorScreen(),
+            transitionType: _TransitionType.fadeSlide,
+          ),
+        ),
+        GoRoute(
+          path: '/my-videos',
+          pageBuilder: (context, state) => _buildPage(
+            state,
+            const MyVideosScreen(),
+            transitionType: _TransitionType.slideRight,
+          ),
+        ),
+        GoRoute(
+          path: '/settings',
+          pageBuilder: (context, state) => _buildPage(
+            state,
+            const SettingsScreen(),
+            transitionType: _TransitionType.slideRight,
+          ),
+        ),
+        GoRoute(
+          path: '/image-tools-hub',
+          pageBuilder: (context, state) => _buildPage(
+            state,
+            const ImageHubScreen(),
+            transitionType: _TransitionType.fadeSlide,
+          ),
+        ),
+      ],
     ),
-    GoRoute(
-      path: '/video-generator',
-      pageBuilder: (context, state) => _buildPage(
-        state,
-        const VideoGeneratorScreen(),
-        transitionType: _TransitionType.fadeSlide,
-      ),
-    ),
+
     GoRoute(
       path: '/pre-gen-ads',
       pageBuilder: (context, state) {
@@ -104,14 +141,6 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) => GoRouter(
       ),
     ),
     GoRoute(
-      path: '/my-videos',
-      pageBuilder: (context, state) => _buildPage(
-        state,
-        const MyVideosScreen(),
-        transitionType: _TransitionType.slideRight,
-      ),
-    ),
-    GoRoute(
       path: '/templates',
       pageBuilder: (context, state) => _buildPage(
         state,
@@ -133,14 +162,6 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) => GoRouter(
         state,
         const BuyCreditsScreen(),
         transitionType: _TransitionType.slideUp,
-      ),
-    ),
-    GoRoute(
-      path: '/settings',
-      pageBuilder: (context, state) => _buildPage(
-        state,
-        const SettingsScreen(),
-        transitionType: _TransitionType.slideRight,
       ),
     ),
     GoRoute(
@@ -173,14 +194,6 @@ GoRouter createAppRouter({GlobalKey<NavigatorState>? navigatorKey}) => GoRouter(
         state,
         const ApplyReferralScreen(),
         transitionType: _TransitionType.slideRight,
-      ),
-    ),
-    GoRoute(
-      path: '/image-tools-hub',
-      pageBuilder: (context, state) => _buildPage(
-        state,
-        const ImageHubScreen(),
-        transitionType: _TransitionType.fadeSlide,
       ),
     ),
     GoRoute(

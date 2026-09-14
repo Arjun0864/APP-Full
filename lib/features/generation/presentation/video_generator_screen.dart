@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -278,11 +280,17 @@ class _VideoGeneratorScreenState extends ConsumerState<VideoGeneratorScreen> {
                   ),
                 ),
               ),
-              const BottomNavBar(currentIndex: 1),
+              if (!_isDesktop(context)) const BottomNavBar(currentIndex: 1),
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool _isDesktop(BuildContext context) {
+    if (kIsWeb) return false;
+    return Platform.isWindows || Platform.isMacOS || Platform.isLinux ||
+        MediaQuery.of(context).size.width >= 800;
   }
 }

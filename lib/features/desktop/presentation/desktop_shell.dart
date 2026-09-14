@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,28 @@ import '../../../models/app_models.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../color_grade/models/color_grade_models.dart';
 import '../../color_grade/providers/color_grade_provider.dart';
+
+/// Platform-aware shell widget used by [ShellRoute].
+///
+/// On desktop (Windows / macOS / Linux): wraps [child] inside [DesktopShell],
+/// providing the persistent top TabBar and full-screen desktop layout.
+///
+/// On mobile / web: passes [child] through unchanged so each screen can render
+/// its own [Scaffold] with a [BottomNavigationBar].
+class AppShell extends ConsumerWidget {
+  final Widget child;
+  const AppShell({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDesktop = !kIsWeb &&
+        (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+    if (isDesktop) {
+      return DesktopShell(child: child);
+    }
+    return child;
+  }
+}
 
 class DesktopShell extends ConsumerStatefulWidget {
   final Widget child;

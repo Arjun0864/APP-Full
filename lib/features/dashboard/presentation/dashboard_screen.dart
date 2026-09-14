@@ -18,7 +18,6 @@ import '../../../core/ads/admob_manager.dart';
 import '../../../core/network/connectivity_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../videos/providers/videos_provider.dart';
-import '../../desktop/presentation/desktop_shell.dart';
 import '../../desktop/presentation/desktop_color_grade_studio.dart';
 import 'app_drawer.dart';
 import 'bottom_nav_bar.dart';
@@ -90,11 +89,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDesktopPlatform = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
-    if (isDesktopPlatform || MediaQuery.of(context).size.width >= 800) {
-      return const DesktopShell(
-        child: DesktopColorGradeStudio(),
-      );
+    final isDesktopPlatform = !kIsWeb &&
+        (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+    // On desktop, AppShell (ShellRoute) already provides DesktopShell —
+    // just render the color grade studio content directly.
+    if (isDesktopPlatform || (!kIsWeb && MediaQuery.of(context).size.width >= 800)) {
+      return const DesktopColorGradeStudio();
     }
 
     final user = ref.watch(authProvider).user;

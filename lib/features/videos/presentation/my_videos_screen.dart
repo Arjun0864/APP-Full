@@ -1,13 +1,15 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/app_models.dart';
 import '../providers/videos_provider.dart';
 import '../../dashboard/presentation/bottom_nav_bar.dart';
-import 'package:intl/intl.dart';
 
 class MyVideosScreen extends ConsumerStatefulWidget {
   const MyVideosScreen({super.key});
@@ -59,12 +61,18 @@ class _MyVideosScreenState extends ConsumerState<MyVideosScreen>
                   ],
                 ),
               ),
-              const BottomNavBar(currentIndex: 1),
+              if (!_isDesktop(context)) const BottomNavBar(currentIndex: 1),
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool _isDesktop(BuildContext context) {
+    if (kIsWeb) return false;
+    return Platform.isWindows || Platform.isMacOS || Platform.isLinux ||
+        MediaQuery.of(context).size.width >= 800;
   }
 
   Widget _buildAppBar(BuildContext context, int count) {

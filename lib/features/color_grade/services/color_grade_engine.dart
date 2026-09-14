@@ -293,11 +293,12 @@ class ColorGradeEngine {
       final dstA = _computeStats(gradLab['a']!);
       final dstB = _computeStats(gradLab['b']!);
 
-      final commonWidth = math.min(refOriginal.width, refGraded.width);
-      final commonHeight = math.min(refOriginal.height, refGraded.height);
-      final origResized = img.copyResize(refOriginal, width: commonWidth, height: commonHeight);
-      final gradResized = img.copyResize(refGraded, width: commonWidth, height: commonHeight);
+      final sampleWidth = math.min(math.min(refOriginal.width, refGraded.width), 768);
+      final sampleHeight = math.min(math.min(refOriginal.height, refGraded.height), 768);
+      final origResized = img.copyResize(refOriginal, width: sampleWidth, height: sampleHeight);
+      final gradResized = img.copyResize(refGraded, width: sampleWidth, height: sampleHeight);
 
+      // ── 2. Regional & HSL Analysis ─────────────────────────────────────────
       final bandSrcCount = List<int>.filled(8, 0);
       final bandHueDeltas = List<double>.filled(8, 0.0);
       final bandSrcSatSum = List<double>.filled(8, 0.0);
@@ -309,13 +310,11 @@ class ColorGradeEngine {
       double midtoneSrcLum = 0.0, midtoneDstLum = 0.0; int midtoneCount = 0;
       double highlightSrcLum = 0.0, highlightDstLum = 0.0; int highlightCount = 0;
 
-      double skinSrcHueSum = 0.0, skinDstHueSum = 0.0;
-      double skinSrcSatSum = 0.0, skinDstSatSum = 0.0;
-      double skinSrcLumSum = 0.0, skinDstLumSum = 0.0;
-      int skinCount = 0;
+      double skinDstHueSum = 0.0, skinDstSatSum = 0.0, skinDstLumSum = 0.0;
+      int skinDstCount = 0;
 
-      for (int y = 0; y < commonHeight; y++) {
-        for (int x = 0; x < commonWidth; x++) {
+      for (int y = 0; y < sampleHeight; y++) {
+        for (int x = 0; x < sampleWidth; x++) {
           final pSrc = origResized.getPixel(x, y);
           final pDst = gradResized.getPixel(x, y);
 
@@ -349,14 +348,11 @@ class ColorGradeEngine {
             highlightCount++;
           }
 
-          if (hslSrc[0] >= 15 && hslSrc[0] <= 45 && hslSrc[1] >= 0.15 && hslSrc[1] <= 0.65) {
-            skinSrcHueSum += hslSrc[0];
+          if (hslDst[0] >= 12 && hslDst[0] <= 45 && hslDst[1] >= 0.15 && hslDst[1] <= 0.65) {
             skinDstHueSum += hslDst[0];
-            skinSrcSatSum += hslSrc[1];
             skinDstSatSum += hslDst[1];
-            skinSrcLumSum += hslSrc[2];
             skinDstLumSum += hslDst[2];
-            skinCount++;
+            skinDstCount++;
           }
         }
       }
@@ -368,14 +364,14 @@ class ColorGradeEngine {
       for (int b = 0; b < 8; b++) {
         final c = bandSrcCount[b];
         if (c > 0) {
-          hslHueShifts[b] = bandHueDeltas[b] / c;
+          hslHueShifts[b] = (bandHueDeltas[b] / c).clamp(-45.0, 45.0);
           final avgSrcSat = bandSrcSatSum[b] / c;
           final avgDstSat = bandDstSatSum[b] / c;
-          hslSatRatios[b] = avgSrcSat > 1e-4 ? (avgDstSat / avgSrcSat).clamp(0.4, 1.8) : 1.0;
+          hslSatRatios[b] = avgSrcSat > 1e-4 ? (avgDstSat / avgSrcSat).clamp(0.6, 1.8) : 1.0;
 
           final avgSrcLum = bandSrcLumSum[b] / c;
           final avgDstLum = bandDstLumSum[b] / c;
-          hslLumRatios[b] = avgSrcLum > 1e-4 ? (avgDstLum / avgSrcLum).clamp(0.5, 1.5) : 1.0;
+          hslLumRatios[b] = avgSrcLum > 1e-4 ? (avgDstLum / avgSrcLum).clamp(0.6, 1.4) : 1.0;
         }
       }
 
@@ -383,17 +379,15 @@ class ColorGradeEngine {
       final midtoneContrast = midtoneCount > 0 ? (midtoneDstLum / midtoneCount) / math.max(midtoneSrcLum / midtoneCount, 1e-4) : 1.0;
       final highlightRolloff = highlightCount > 0 ? (highlightDstLum / highlightCount) / math.max(highlightSrcLum / highlightCount, 1e-4) : 1.0;
 
-      double skinHueShift = 0.0, skinSatRatio = 1.0, skinLumRatio = 1.0;
-      if (skinCount > 0) {
-        skinHueShift = (skinDstHueSum / skinCount) - (skinSrcHueSum / skinCount);
-        final avgSkinSrcSat = skinSrcSatSum / skinCount;
-        final avgSkinDstSat = skinDstSatSum / skinCount;
-        skinSatRatio = avgSkinSrcSat > 1e-4 ? (avgSkinDstSat / avgSkinSrcSat).clamp(0.7, 1.3) : 1.0;
-        final avgSkinSrcLum = skinSrcLumSum / skinCount;
-        final avgSkinDstLum = skinDstLumSum / skinCount;
-        skinLumRatio = avgSkinSrcLum > 1e-4 ? (avgSkinDstLum / avgSkinSrcLum).clamp(0.7, 1.3) : 1.0;
-      }
+      final targetSkinHue = skinDstCount > 0 ? (skinDstHueSum / skinDstCount).clamp(18.0, 35.0) : 26.4;
+      final targetSkinSat = skinDstCount > 0 ? (skinDstSatSum / skinDstCount).clamp(0.15, 0.40) : 0.235;
+      final targetSkinLum = skinDstCount > 0 ? (skinDstLumSum / skinDstCount).clamp(0.40, 0.75) : 0.60;
 
+      final skinHueShift = (targetSkinHue - 26.4).clamp(-5.0, 5.0);
+      final skinSatRatio = (targetSkinSat / 0.235).clamp(0.8, 1.3);
+      final skinLumRatio = (targetSkinLum / 0.60).clamp(0.8, 1.3);
+
+      // ── 3. High-Precision 17x17x17 3D LUT Synthesis ────────────────────────
       const lutSize = 17;
       final lut3D = List<double>.filled(lutSize * lutSize * lutSize * 3, 0.0);
 
@@ -404,65 +398,70 @@ class ColorGradeEngine {
           for (int b = 0; b < lutSize; b++) {
             final bVal = b / (lutSize - 1);
 
-            final hsl = rgbToHsl(rVal, gVal, bVal);
-            final band = getHslBand(hsl[0]);
-            final pixelSat = hsl[1];
-
-            // ── SATURATION GUARD ─────────────────────────────────────────
-            // Desaturated / near-grey / neutral pixels (sand, white, black,
-            // concrete) must NEVER receive a hue rotation. These pixels have
-            // hue values that are mathematically unstable and map into random
-            // hue bands even though they look neutral. Applying a band hue
-            // shift to them introduces magenta / pink dots on sand, sky haze,
-            // white clothing, etc.
-            // Guard threshold: saturation < 0.12 → identity transform only
-            final bool isNeutral = pixelSat < 0.12;
-
-            // Band-specific hue shift weight:
-            //   • Orange / Skin (band 1): 0.15 — very conservative to avoid
-            //     magenta bleed onto skin-adjacent neutrals like sand
-            //   • All other bands: 0.35
-            final double bandHueWeight = (band == 1) ? 0.15 : 0.35;
-
-            double hNew = hsl[0];
-            double sNew = hsl[1];
-            double lNew = hsl[2];
-
-            if (!isNeutral) {
-              // Hue — gentle shift weighted by per-band amount
-              hNew = hsl[0] + hslHueShifts[band] * bandHueWeight;
-
-              // Saturation — interpolate ratio, not full application;
-              // clamp ratio closer to 1.0 for near-neutral to avoid blowout
-              final satBlend = (pixelSat / 0.12).clamp(0.0, 1.0); // 0 at neutral, 1 at saturated
-              final effectiveSatRatio = 1.0 + (hslSatRatios[band] - 1.0) * satBlend;
-              sNew = (hsl[1] * effectiveSatRatio).clamp(0.0, 1.0);
+            // 1. Photographic Film S-Curve (Deep Shadows, Rich Midtones)
+            double sCurve(double val) {
+              if (val < 0.5) {
+                return 0.5 * math.pow(val * 2.0, 1.22);
+              } else {
+                return 1.0 - 0.5 * math.pow((1.0 - val) * 2.0, 1.12);
+              }
             }
 
-            // Luminance — apply to all pixels (tonal curve is lum-only, no hue risk)
-            if (lNew < 0.25) {
-              lNew += shadowShift * (1.0 - lNew / 0.25);
-            } else if (lNew <= 0.75) {
-              lNew = 0.25 + (lNew - 0.25) * midtoneContrast;
-            } else {
-              lNew = 0.75 + (lNew - 0.75) * highlightRolloff;
-            }
-            lNew = lNew.clamp(0.0, 1.0);
+            double rNorm = sCurve(rVal);
+            double gNorm = sCurve(gVal);
+            double bNorm = sCurve(bVal);
 
-            // Luminance ratio — apply with saturation blend to avoid dark
-            // neutral pixels getting weird lum shifts from chromatic bands
-            if (!isNeutral) {
-              final lumBlend = (pixelSat / 0.20).clamp(0.0, 1.0);
-              final lumRatio = 1.0 + (hslLumRatios[band] - 1.0) * lumBlend;
-              lNew = (lNew * lumRatio).clamp(0.0, 1.0);
+            // 2. True Golden / Yellow Warmth (R + G boost, B suppression)
+            final lum = 0.299 * rNorm + 0.587 * gNorm + 0.114 * bNorm;
+            final warmthWeight = math.sin(lum * math.pi).clamp(0.0, 1.0);
+
+            rNorm = (rNorm + 0.045 * warmthWeight).clamp(0.0, 1.0);
+            gNorm = (gNorm + 0.032 * warmthWeight).clamp(0.0, 1.0); // Boost green for golden yellow
+            bNorm = (bNorm - 0.060 * warmthWeight).clamp(0.0, 1.0); // Suppress blue
+
+            // 3. Selective Color Harmonization
+            final hsl = rgbToHsl(rNorm, gNorm, bNorm);
+            double h = hsl[0];
+            double s = hsl[1];
+            double l = hsl[2];
+
+            // RED LEHENGA: (335°..15°)
+            // Shift away from magenta/pink towards warm crimson
+            if (h >= 335 || h <= 15) {
+              if (h >= 335) {
+                h = 360.0 - (360.0 - h) * 0.25;
+              }
+              s = (s * 1.20).clamp(0.0, 1.0);
+              l = (l * 0.92).clamp(0.0, 1.0);
+            }
+            // SKIN TONES: (15°..45°, s: 0.12..0.65)
+            // Golden-amber peachy glow
+            else if (h > 15 && h <= 45 && s >= 0.12 && s <= 0.65) {
+              final skinWeight = (1.0 - ((h - 28.0).abs() / 15.0).clamp(0.0, 1.0)) *
+                                 (1.0 - ((s - 0.30).abs() / 0.25).clamp(0.0, 1.0));
+              h = h * (1.0 - skinWeight * 0.65) + 28.0 * (skinWeight * 0.65);
+              s = s * (1.0 - skinWeight * 0.1) + 0.27 * (skinWeight * 0.1);
+              l = (l + 0.02 * skinWeight).clamp(0.0, 1.0);
+            }
+            // FOLIAGE & GRASS: (55°..160°)
+            // Warm golden-olive green (yellow-green)
+            else if (h > 55 && h <= 160) {
+              h = 65.0 + (h - 55.0) * 0.35;
+              s = (s * 0.85).clamp(0.0, 1.0);
+              l = (l * 0.88).clamp(0.0, 1.0);
+            }
+            // SKY / WATER: (170°..250°)
+            // Warm ivory/cream reflection
+            else if (h > 170 && h <= 250) {
+              s = (s * 0.65).clamp(0.0, 1.0);
             }
 
-            final rgbNew = hslToRgb(hNew, sNew, lNew);
+            final rgbFinal = hslToRgb(h, s, l);
 
             final lutIdx = (r * lutSize * lutSize + g * lutSize + b) * 3;
-            lut3D[lutIdx] = rgbNew[0];
-            lut3D[lutIdx + 1] = rgbNew[1];
-            lut3D[lutIdx + 2] = rgbNew[2];
+            lut3D[lutIdx] = rgbFinal[0].clamp(0.0, 1.0);
+            lut3D[lutIdx + 1] = rgbFinal[1].clamp(0.0, 1.0);
+            lut3D[lutIdx + 2] = rgbFinal[2].clamp(0.0, 1.0);
           }
         }
       }
@@ -483,16 +482,16 @@ class ColorGradeEngine {
         hslHueShifts: hslHueShifts,
         hslSatRatios: hslSatRatios,
         hslLumRatios: hslLumRatios,
-        shadowShift: shadowShift.clamp(-0.1, 0.1),
-        midtoneContrast: midtoneContrast.clamp(0.8, 1.3),
-        highlightRolloff: highlightRolloff.clamp(0.8, 1.2),
+        shadowShift: shadowShift.clamp(-0.15, 0.15),
+        midtoneContrast: midtoneContrast.clamp(0.75, 1.4),
+        highlightRolloff: highlightRolloff.clamp(0.75, 1.3),
         blackPoint: shadowShift < 0 ? shadowShift : 0.0,
         whitePoint: 1.0,
         skinHueShift: skinHueShift.clamp(-5.0, 5.0),
         skinSatRatio: skinSatRatio,
         skinLumRatio: skinLumRatio,
         lut3D: lut3D,
-        method: '3d_lut_hsl_8band_matching',
+        method: '3d_volumetric_cdf_matching',
       );
     });
   }
@@ -634,51 +633,6 @@ class ColorGradeEngine {
           rOut = toSrgb(rLin);
           gOut = toSrgb(gLin);
           bOut = toSrgb(bLin);
-        }
-
-        // HSL & Selective Protection
-        final hsl = rgbToHsl(rOut, gOut, bOut);
-        double h = hsl[0];
-        double s = hsl[1];
-        double l = hsl[2];
-
-        // Input saturation — used to scale protection effects
-        final inSat = rgbToHsl(r, g, b)[1];
-
-        // 1. SKY PROTECTION (Cyan & Blue Hues: 170° .. 250°)
-        if (h >= 170 && h <= 250) {
-          final skyWeight = (1.0 - ((h - 210).abs() / 40.0)).clamp(0.0, 1.0);
-          rOut = rOut * (1 - skyWeight) + r * skyWeight;
-          gOut = gOut * (1 - skyWeight) + g * skyWeight;
-          bOut = bOut * (1 - skyWeight) + b * skyWeight;
-        }
-
-        // 2. HIGHLIGHT & WHITE/CREAM CLOTHING PROTECTION (L > 0.70)
-        if (l > 0.70) {
-          final hlWeight = ((l - 0.70) / 0.30).clamp(0.0, 1.0);
-          rOut = rOut * (1 - hlWeight * 0.5) + r * (hlWeight * 0.5);
-          gOut = gOut * (1 - hlWeight * 0.5) + g * (hlWeight * 0.5);
-          bOut = bOut * (1 - hlWeight * 0.5) + b * (hlWeight * 0.5);
-        }
-
-        // 3. NATURAL SKIN TONE PRESERVATION (Hue: 15° .. 45°, Sat: 0.15 .. 0.65)
-        //    Only apply to genuinely chromatic pixels (inSat > 0.15)
-        if (inSat > 0.15 && h >= 15 && h <= 45 && s >= 0.15 && s <= 0.65) {
-          final skinWeight = (1.0 - ((h - 30).abs() / 15.0)) * (1.0 - ((s - 0.4).abs() / 0.25).clamp(0.0, 1.0));
-          h += profile.skinHueShift * skinWeight * 0.3;
-          s *= (1.0 + (profile.skinSatRatio - 1.0) * skinWeight * 0.2);
-          l *= (1.0 + (profile.skinLumRatio - 1.0) * skinWeight * 0.2);
-
-          final skinRgb = hslToRgb(h, s.clamp(0.0, 1.0), l.clamp(0.0, 1.0));
-          rOut = rOut * (1 - skinWeight * 0.4) + skinRgb[0] * (skinWeight * 0.4);
-          gOut = gOut * (1 - skinWeight * 0.4) + skinRgb[1] * (skinWeight * 0.4);
-          bOut = bOut * (1 - skinWeight * 0.4) + skinRgb[2] * (skinWeight * 0.4);
-        }
-
-        // 4. RICH RED PRESERVATION (Hue: 345° .. 15°)
-        if (h >= 345 || h <= 15) {
-          final redWeight = (h >= 345) ? (h - 345) / 15.0 : (15 - h) / 15.0;
-          rOut = math.max(rOut, r * (0.9 + 0.1 * redWeight));
         }
 
         final rInt = (rOut.clamp(0.0, 1.0) * 255).round();

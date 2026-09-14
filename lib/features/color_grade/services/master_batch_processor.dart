@@ -101,10 +101,11 @@ class MasterBatchProcessor {
           }
 
           // Write output immediately to disk and free memory
-          final baseName = path.split(Platform.pathSeparator).last.replaceAll(RegExp(r'\.[^\.]+$'), '');
+          final fileName = path.split(RegExp(r'[\\/]')).last;
+          final baseName = fileName.replaceAll(RegExp(r'\.[^\.]+$'), '');
           final outExt = format == ExportFormat.tiff ? 'tif' : 'jpg';
-          final outPath = '${outputDir.path}/${baseName}_graded.$outExt';
-          await File(outPath).writeAsBytes(gradedBytes);
+          final outPath = '${outputDir.path}${Platform.pathSeparator}${baseName}_graded.$outExt';
+          await File(outPath).writeAsBytes(gradedBytes, flush: true);
 
           return _ProcessingResult(index: itemIndex, sourcePath: path, outputPath: outPath);
         } catch (e) {
@@ -142,6 +143,7 @@ class MasterBatchProcessor {
         decodable,
         payload.profile,
         targetQuality: payload.quality,
+        format: payload.format,
       );
       return graded;
     } catch (_) {

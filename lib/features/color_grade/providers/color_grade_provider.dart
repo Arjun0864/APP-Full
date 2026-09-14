@@ -7,18 +7,7 @@ import '../services/master_batch_processor.dart';
 class ColorGradeNotifier extends StateNotifier<ColorGradeState> {
   MasterBatchProcessor? _masterProcessor;
 
-  ColorGradeNotifier() : super(const ColorGradeState()) {
-    _restoreState();
-  }
-
-  Future<void> _restoreState() async {
-    try {
-      final savedState = await ColorGradePersistence.instance.loadColorGradeState();
-      if (savedState != null) {
-        state = savedState;
-      }
-    } catch (_) {}
-  }
+  ColorGradeNotifier() : super(const ColorGradeState());
 
   Future<void> _saveState() async {
     try {
@@ -55,6 +44,12 @@ class ColorGradeNotifier extends StateNotifier<ColorGradeState> {
   void reset() {
     state = const ColorGradeState();
     _saveState();
+  }
+
+  Future<void> resetAllSession() async {
+    _masterProcessor?.cancel();
+    state = const ColorGradeState();
+    await ColorGradePersistence.instance.clearState();
   }
 
   Future<void> analyzeGrade() async {

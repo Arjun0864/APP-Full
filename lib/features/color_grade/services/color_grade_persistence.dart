@@ -71,17 +71,31 @@ class ColorGradePersistence {
         profile = GradeProfile.fromJson(map['profile'] as Map<String, dynamic>);
       }
 
-      final inputPaths = (map['input_paths'] as List?)?.map((e) => e.toString()).toList() ?? [];
-      final batchItems = inputPaths.map((p) => ColorGradeItem(sourcePath: p)).toList();
+      final rawInputPaths = (map['input_paths'] as List?)?.map((e) => e.toString()).toList() ?? [];
+      final validBatchItems = <ColorGradeItem>[];
+      for (final p in rawInputPaths) {
+        if (File(p).existsSync()) {
+          validBatchItems.add(ColorGradeItem(sourcePath: p));
+        }
+      }
+
+      final rawRefPath = map['ref_raw_path'] as String?;
+      final gradedRefPath = map['ref_graded_path'] as String?;
+
+      final validRawRef = (rawRefPath != null && File(rawRefPath).existsSync()) ? rawRefPath : null;
+      final validGradedRef = (gradedRefPath != null && File(gradedRefPath).existsSync()) ? gradedRefPath : null;
+
+      // If reference images are gone, don't keep invalid references
+      final validProfile = (validRawRef != null && validGradedRef != null) ? profile : null;
 
       return ColorGradeState(
-        referenceRawPath: map['ref_raw_path'] as String?,
-        referenceGradedPath: map['ref_graded_path'] as String?,
-        profile: profile,
-        batchItems: batchItems,
+        referenceRawPath: validRawRef,
+        referenceGradedPath: validGradedRef,
+        profile: validProfile,
+        batchItems: validBatchItems,
         exportFormat: map['export_format'] == 'tiff' ? ExportFormat.tiff : ExportFormat.jpeg,
         jpegQuality: map['jpeg_quality'] as int? ?? 95,
-        status: profile != null ? ColorGradeStatus.readyToBatch : ColorGradeStatus.idle,
+        status: validProfile != null ? ColorGradeStatus.readyToBatch : ColorGradeStatus.idle,
       );
     } catch (e) {
       debugPrint('[ColorGradePersistence] Load error: $e');

@@ -114,15 +114,58 @@ class _DesktopColorGradeStudioState extends ConsumerState<DesktopColorGradeStudi
                 child: const Icon(Icons.compare_arrows_rounded, size: 16, color: AppColors.goldBase),
               ),
               const SizedBox(width: 10),
-              Text(
-                'REFERENCE PAIR',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: theme.textMuted,
-                  letterSpacing: 0.8,
+              Expanded(
+                child: Text(
+                  'REFERENCE PAIR',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: theme.textMuted,
+                    letterSpacing: 0.8,
+                  ),
                 ),
               ),
+              if (state.referenceRawPath != null || state.referenceGradedPath != null || state.batchItems.isNotEmpty)
+                Tooltip(
+                  message: 'Reset All (Start Fresh Session)',
+                  child: InkWell(
+                    onTap: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: const Color(0xFF1E1E1E),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          title: const Text('Start New Session?', style: TextStyle(color: Colors.white, fontSize: 16)),
+                          content: const Text('This will clear the reference pair and batch photos.', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: AppColors.goldBase),
+                              onPressed: () => Navigator.pop(ctx, true),
+                              child: const Text('Reset', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed == true) {
+                        setState(() => _selectedIndices.clear());
+                        await notifier.resetAllSession();
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(6),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.refresh_rounded, size: 13, color: theme.textMuted),
+                          const SizedBox(width: 4),
+                          Text('New', style: TextStyle(fontSize: 10, color: theme.textMuted, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 6),
@@ -445,12 +488,11 @@ class _DesktopColorGradeStudioState extends ConsumerState<DesktopColorGradeStudi
     ColorGradeState state,
   ) {
     // Current active preview file
-    final activeItem = state.batchItems.isNotEmpty && _selectedPreviewIndex < state.batchItems.length
-        ? state.batchItems[_selectedPreviewIndex]
-        : null;
+    final isViewingBatch = state.batchItems.isNotEmpty && _selectedPreviewIndex < state.batchItems.length;
+    final activeItem = isViewingBatch ? state.batchItems[_selectedPreviewIndex] : null;
 
-    final sourcePath = activeItem?.sourcePath ?? state.referenceRawPath;
-    final gradedPath = activeItem?.outputPath ?? state.referenceGradedPath;
+    final sourcePath = isViewingBatch ? activeItem?.sourcePath : state.referenceRawPath;
+    final gradedPath = isViewingBatch ? activeItem?.outputPath : state.referenceGradedPath;
 
     if (sourcePath == null) {
       return Container(
@@ -1151,7 +1193,7 @@ class _DesktopColorGradeStudioState extends ConsumerState<DesktopColorGradeStudi
 
   Future<void> _downloadSingleItem(BuildContext context, ColorGradeItem item) async {
     if (item.outputPath == null) return;
-    final fileName = item.outputPath!.split(Platform.pathSeparator).last;
+    final fileName = item.outputPath!.split(RegExp(r'[\\/]')).last;
     final savePath = await FilePicker.platform.saveFile(
       dialogTitle: 'Save Graded Photo',
       fileName: fileName,
@@ -1201,21 +1243,28 @@ class _DesktopColorGradeStudioState extends ConsumerState<DesktopColorGradeStudi
     final dir = await FilePicker.platform.getDirectoryPath(dialogTitle: 'Choose Folder to Save Photos');
     if (dir == null) return;
 
+    final normalizedDir = (dir.endsWith('/') || dir.endsWith('\\'))
+        ? dir.substring(0, dir.length - 1)
+        : dir;
+
     int saved = 0;
     for (final item in items) {
       try {
         final src = File(item.outputPath!);
-        final fileName = item.outputPath!.split(Platform.pathSeparator).last;
-        await src.copy('$dir${Platform.pathSeparator}$fileName');
-        saved++;
+        if (await src.exists()) {
+          final fileName = item.outputPath!.split(RegExp(r'[\\/]')).last;
+          final destPath = '$normalizedDir${Platform.pathSeparator}$fileName';
+          await src.copy(destPath);
+          saved++;
+        }
       } catch (_) {}
     }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ $saved photo${saved == 1 ? '' : 's'} saved to $dir'),
-          backgroundColor: AppColors.success,
+          content: Text('✓ $saved photo${saved == 1 ? '' : 's'} saved to $normalizedDir'),
+          backgroundColor: saved > 0 ? AppColors.success : AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           duration: const Duration(seconds: 4),
@@ -1238,21 +1287,28 @@ class _DesktopColorGradeStudioState extends ConsumerState<DesktopColorGradeStudi
     );
     if (dir == null) return;
 
+    final normalizedDir = (dir.endsWith('/') || dir.endsWith('\\'))
+        ? dir.substring(0, dir.length - 1)
+        : dir;
+
     int saved = 0;
     for (final item in allCompleted) {
       try {
         final src = File(item.outputPath!);
-        final fileName = item.outputPath!.split(Platform.pathSeparator).last;
-        await src.copy('$dir${Platform.pathSeparator}$fileName');
-        saved++;
+        if (await src.exists()) {
+          final fileName = item.outputPath!.split(RegExp(r'[\\/]')).last;
+          final destPath = '$normalizedDir${Platform.pathSeparator}$fileName';
+          await src.copy(destPath);
+          saved++;
+        }
       } catch (_) {}
     }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ $saved photo${saved == 1 ? '' : 's'} saved to $dir'),
-          backgroundColor: AppColors.success,
+          content: Text('✓ $saved photo${saved == 1 ? '' : 's'} saved to $normalizedDir'),
+          backgroundColor: saved > 0 ? AppColors.success : AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           duration: const Duration(seconds: 4),

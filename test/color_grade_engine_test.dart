@@ -33,7 +33,7 @@ void main() {
         refGraded: gradImg,
       );
 
-      expect(profile.method, equals('3d_lut_hsl_8band_matching'));
+      expect(profile.method, equals('3d_volumetric_cdf_matching'));
       expect(profile.lut3D.length, equals(17 * 17 * 17 * 3));
       expect(profile.hslHueShifts.length, equals(8));
       expect(profile.dstLMean, greaterThan(profile.srcLMean));

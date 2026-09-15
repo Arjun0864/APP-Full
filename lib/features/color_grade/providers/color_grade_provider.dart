@@ -156,6 +156,7 @@ class ColorGradeNotifier extends StateNotifier<ColorGradeState> {
             outputPath: update.lastOutputPath,
             status: isSuccess ? ColorGradeItemStatus.completed : ColorGradeItemStatus.failed,
             errorMessage: update.lastError,
+            confidence: update.confidence,
           );
         }
 

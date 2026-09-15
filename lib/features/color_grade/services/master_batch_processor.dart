@@ -85,7 +85,7 @@ class MasterBatchProcessor {
           final bytes = await file.readAsBytes();
 
           // Apply color grading via isolate engine
-          final gradedBytes = await compute(
+          final (gradedBytes, confidence) = await compute(
             _isolateApplyTask,
             _IsolateApplyPayload(
               imageBytes: bytes,
@@ -107,7 +107,12 @@ class MasterBatchProcessor {
           final outPath = '${outputDir.path}${Platform.pathSeparator}${baseName}_graded.$outExt';
           await File(outPath).writeAsBytes(gradedBytes, flush: true);
 
-          return _ProcessingResult(index: itemIndex, sourcePath: path, outputPath: outPath);
+          return _ProcessingResult(
+            index: itemIndex,
+            sourcePath: path,
+            outputPath: outPath,
+            confidence: confidence,
+          );
         } catch (e) {
           return _ProcessingResult(index: itemIndex, sourcePath: path, error: e.toString());
         }
@@ -130,24 +135,25 @@ class MasterBatchProcessor {
           lastSourcePath: res.sourcePath,
           lastOutputPath: res.outputPath,
           lastError: res.error,
+          confidence: res.confidence,
           isCancelled: _isCancelled,
         );
       }
     }
   }
 
-  static Uint8List? _isolateApplyTask(_IsolateApplyPayload payload) {
+  static (Uint8List?, double) _isolateApplyTask(_IsolateApplyPayload payload) {
     try {
       final decodable = ColorGradeEngine.extractDecodableBytes(payload.imageBytes, payload.ext);
-      final graded = ColorGradeEngine.instance.applyGradeToBytes(
+      final (graded, conf) = ColorGradeEngine.instance.applyGradeToBytesWithConfidence(
         decodable,
         payload.profile,
         targetQuality: payload.quality,
         format: payload.format,
       );
-      return graded;
+      return (graded, conf);
     } catch (_) {
-      return null;
+      return (null, 0.0);
     }
   }
 }
@@ -173,12 +179,14 @@ class _ProcessingResult {
   final String sourcePath;
   final String? outputPath;
   final String? error;
+  final double? confidence;
 
   _ProcessingResult({
     required this.index,
     required this.sourcePath,
     this.outputPath,
     this.error,
+    this.confidence,
   });
 
   bool get isSuccess => outputPath != null && error == null;
@@ -192,6 +200,7 @@ class BatchProgressUpdate {
   final String? lastSourcePath;
   final String? lastOutputPath;
   final String? lastError;
+  final double? confidence;
   final bool isCancelled;
 
   BatchProgressUpdate({
@@ -202,6 +211,7 @@ class BatchProgressUpdate {
     this.lastSourcePath,
     this.lastOutputPath,
     this.lastError,
+    this.confidence,
     this.isCancelled = false,
   });
 

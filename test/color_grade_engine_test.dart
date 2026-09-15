@@ -33,10 +33,10 @@ void main() {
         refGraded: gradImg,
       );
 
-      expect(profile.method, equals('3d_volumetric_cdf_matching'));
+      expect(profile.method, equals('3d_adaptive_reference_lut'));
       expect(profile.lut3D.length, equals(17 * 17 * 17 * 3));
       expect(profile.hslHueShifts.length, equals(8));
-      expect(profile.dstLMean, greaterThan(profile.srcLMean));
+      expect(profile.toneCurve.length, equals(256));
     });
 
     test('applyGrade should transform target image using 3D LUT profile', () {

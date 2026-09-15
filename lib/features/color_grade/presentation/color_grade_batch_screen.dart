@@ -551,10 +551,35 @@ class _ColorGradeBatchScreenState
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      item.fileName,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.fileName,
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (item.confidence != null) ...[
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              if (item.confidence! < 0.50) ...[
+                                const Icon(Icons.warning_amber_rounded, color: Color(0xFFF59E0B), size: 12),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Low overlap (${(item.confidence! * 100).toInt()}%)',
+                                  style: const TextStyle(color: Color(0xFFF59E0B), fontSize: 10, fontWeight: FontWeight.w600),
+                                ),
+                              ] else ...[
+                                Text(
+                                  'Match ${(item.confidence! * 100).toInt()}%',
+                                  style: const TextStyle(color: Color(0xFF10B981), fontSize: 10),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   if (item.isSuccess)

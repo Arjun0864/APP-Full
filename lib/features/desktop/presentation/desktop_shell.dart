@@ -179,60 +179,66 @@ class _DesktopShellState extends ConsumerState<DesktopShell> {
 
           // Central Top TabBar with Smooth Animated Pill Indicator
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: tabs.map((tab) {
-                final isSelected = tab.route == currentRoute ||
-                    (tab.route == '/dashboard' && (currentRoute == '/' || currentRoute.contains('/color-grade')));
+            child: Center(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: tabs.map((tab) {
+                    final isSelected = tab.route == currentRoute ||
+                        (tab.route == '/dashboard' && (currentRoute == '/' || currentRoute.contains('/color-grade')));
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap: () {
-                      if (!isSelected) {
-                        context.go(tab.route);
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 240),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.goldBase.withValues(alpha: 0.16)
-                            : Colors.transparent,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: InkWell(
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.goldBase.withValues(alpha: 0.4)
-                              : Colors.transparent,
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isSelected ? tab.activeIcon : tab.icon,
-                            size: 16,
-                            color: isSelected ? AppColors.goldLight : theme.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            tab.label,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? theme.textPrimary : theme.textSecondary,
+                        onTap: () {
+                          if (!isSelected) {
+                            context.go(tab.route);
+                          }
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 240),
+                          curve: Curves.easeOutCubic,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.goldBase.withValues(alpha: 0.16)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.goldBase.withValues(alpha: 0.4)
+                                  : Colors.transparent,
+                              width: 1,
                             ),
                           ),
-                        ],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isSelected ? tab.activeIcon : tab.icon,
+                                size: 16,
+                                color: isSelected ? AppColors.goldLight : theme.textSecondary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                tab.label,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? theme.textPrimary : theme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ),
 
